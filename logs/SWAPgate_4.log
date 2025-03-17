@@ -1,0 +1,6 @@
+2025-03-17 22:38:14,446 - root          - INFO    - 2025-03-17 22:38:14.446730
+2025-03-17 22:38:14,447 - root          - INFO    - Storing logs in /Users/victorlopata/Desktop/LAUREA 2024/BarrierCertificate-Verification/QuantumVerification/logs/SWAPgate_4.log
+2025-03-17 22:38:14,447 - root          - INFO    - Running SWAPgate_4 example
+2025-03-17 22:38:14,458 - sampling      - INFO    - Sampling initial states...
+2025-03-17 22:38:34,757 - sampling      - INFO    - Initial states sampled.
+2025-03-17 22:38:34,758 - sampling      - INFO    - Sampling unsafe states...

@@ -1,0 +1,6 @@
+2025-03-17 22:14:15,954 - root          - INFO    - 2025-03-17 22:14:15.954169
+2025-03-17 22:14:15,954 - root          - INFO    - Storing logs in /Users/victorlopata/Desktop/LAUREA 2024/BarrierCertificate-Verification/QuantumVerification/logs/Tgate_3.log
+2025-03-17 22:14:15,954 - root          - INFO    - Running Tgate_3 example
+2025-03-17 22:14:15,957 - sampling      - INFO    - Sampling states
+2025-03-17 22:14:16,195 - synthesizeBC  - INFO    - Making constraints for the linear optimization problem...
+2025-03-17 22:14:16,195 - synthesizeBC  - INFO    - Solveing LP proble...
