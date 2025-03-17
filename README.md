@@ -11,14 +11,6 @@ This repository contains the implementation of a scenario-based methodology for 
 - **Integration with SMT Solvers**: Uses Z3 for formal verification of synthesized certificates.
 - **Linear Programming Optimization**: Employs **`scipy.optimize`** for solving certificate constraints.
 
-## Installation
-todo
 
 ## Usage
-TODO
-
-## Project Structure
-todo
-
-## References
-TODO
+Run **`zsh ./examples/example.sh`**.
