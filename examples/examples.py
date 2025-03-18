@@ -81,7 +81,7 @@ def CXCZ_example(N_QUBIT):
     Zu = [{'variables': [Z[0]], 'min': 0, 'max': 0.1, 'imConstr': {}}]
     unitaries = [np.dot(n_gate(CXgate, N_QUBIT // 2), n_gate(CZgate, N_QUBIT // 2))]
 
-    return
+    return Z, var, Z0, Zu, unitaries, log_file
 
 
 def H_example(N_QUBIT):
@@ -101,9 +101,9 @@ def SWAP_example(N_QUBIT):
     log_file = f"SWAPgate_{N_QUBIT}"
     Z = generate_symbols(N_QUBIT)
     var = generate_variables(Z)
-    Z0 = [{'variables': [Z[1]], 'min': 0.9, 'max': 1.0, 'imConstr': {}}]
+    Z0 = [{'variables': [Z[0]], 'min': 0.9, 'max': 1, 'imConstr': {}}]
     Zu = [{'variables': [Z[0]], 'min': 0.5, 'max': 1.0, 'imConstr': {}}]
-    unitaries = [n_gate(SWAP, N_QUBIT)]
+    unitaries = [n_gate(SWAP, N_QUBIT // 2)]
 
     return Z, var, Z0, Zu, unitaries, log_file
 
@@ -178,7 +178,7 @@ parser.add_argument("--mu", type=float, default=0.3,
 parser.add_argument("-type", type=str, default='infinite',
                     help="Barrier Certificate Type.")
 parser.add_argument("--steps", type=int, default=1,
-                    help="NUmber of steps for the finite horizon BC.")
+                    help="Number of steps for the finite horizon BC.")
 
 if __name__ == '__main__':
     args = parser.parse_args()
