@@ -11,6 +11,12 @@ This repository contains the implementation of a scenario-based methodology for 
 - **Integration with SMT Solvers**: Uses Z3 for formal verification of synthesized certificates.
 - **Linear Programming Optimization**: Employs **`scipy.optimize`** for solving certificate constraints.
 
+## Installing Dependencies
+To install dependencies listed in **`requirements.txt`**, run the following command in your terminal or command prompt:
+```
+pip install -r requirements.txt
+```
 
 ## Usage
-Run **`zsh ./examples/example.sh`**.
+The examples directory contains script files for running specific examples. To execute an example, use the following command: **`zsh ./examples/<example>.sh`**.
+
