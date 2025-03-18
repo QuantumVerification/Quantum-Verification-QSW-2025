@@ -1,16 +1,12 @@
 import logging
-
 import numpy as np
 import sympy as sym
 from typing import Tuple, List
 from src.utils import *
 from scipy.optimize import linprog
-
 from src.utils import construct_complex_coefficients
 
 logger = logging.getLogger("linearOpt")
-
-
 
 def generate_constraints_fin(
     real_imag: np.ndarray,
@@ -70,19 +66,12 @@ def generate_constraints_fin(
         Aub_coeffs[:, 0::2] = re
         Aub_coeffs[:, 1::2] = -im
 
-
         # Append -1 for the epsilon variable
         Aub = np.hstack([Aub_coeffs, -1 * np.ones((num_samples, 1))])
-
         # Append 0 for the sigma variable
         Aub = np.hstack([Aub, np.zeros((num_samples, 1))])
-
         # Append zero for the 'y' variable
         Aub = np.hstack([Aub, np.zeros((num_samples, 1))])
-
-
-
-
         # Right-hand side vectors
         bub = np.full(num_samples, right_hand_value, dtype=np.float64)
 
@@ -100,15 +89,10 @@ def generate_constraints_fin(
 
         # Append zero for the epsilon variable
         Aub = np.hstack([Aub_coeffs, np.zeros((num_samples, 1))])
-
         # Append 0 for the sigma variable
         Aub = np.hstack([Aub, np.zeros((num_samples, 1))])
-
         # Append one for the 'y' variable (since the inequality involves y)
         Aub = np.hstack([Aub, np.ones((num_samples, 1))])
-
-
-
         # Right-hand side vectors
         bub = np.full(num_samples,right_hand_value , dtype=np.float64)
 
@@ -118,8 +102,6 @@ def generate_constraints_fin(
 
         # Calculate the difference between dynamic and original values
         delta = dynamic_real_imag  - real_imag  # Shape: (num_samples, num_terms, 2)
-
-
         # Separate the real and imaginary parts of the differences
         delta_re = delta[:, :, 0]  # Real parts
         delta_im = delta[:, :, 1]  # Imaginary parts
@@ -133,24 +115,16 @@ def generate_constraints_fin(
 
         # Append zero for the epsilon variable
         Aub = np.hstack([Aub_coeffs, np.zeros((num_samples, 1))])
-
         # Append -1 for the sigma variable
         Aub = np.hstack([Aub, -1 * np.ones((num_samples, 1))])
-
         # Append zero for the 'y' variable
         Aub = np.hstack([Aub, np.zeros((num_samples, 1))])
-
-
-
-
         # Right-hand side vectors
         bub = np.full(num_samples, right_hand_value, dtype=np.float64)
-
     else:
         raise ValueError("Invalid constraint_type. Must be 'initial', 'unsafe', or 'dynamic'.")
 
     return Aub, bub
-
 
 def generate_all_constraints_fin(
     initial_real_imag,
@@ -208,40 +182,27 @@ def generate_all_constraints_fin(
 
         # Append num_passi for the sigma variable
         Aub_eps = np.hstack([Aub_eps, num_passi * np.ones((1, 1))])
-
         # Append -1 for the delta variable
         Aub_eps = np.hstack([Aub_eps, -1 * np.ones((1, 1))])
-
         # Append small value for < 0
         bub = [-1]
-
         vmatr.append(Aub_eps)
         hmatr.append(bub)
-
         Aub_coeffs = np.zeros((1, 2 * num_terms), dtype=np.float64)
-
         # Append 1 for the epsilon variable
         Aub_eps = np.hstack([Aub_coeffs, np.ones((1, 1))])
-
         # Append 0 for the sigma variable
         Aub_eps = np.hstack([Aub_eps, 0 * np.ones((1, 1))])
-
         # Append -1 for the delta variable
         Aub_eps = np.hstack([Aub_eps, -1 * np.ones((1, 1))])
-
         # Append small value for < 0
         bub = [-0.000001]
-
         vmatr.append(Aub_eps)
         hmatr.append(bub)
-
 
     # Concatenate all inequality constraints
     Aub = np.vstack(vmatr)
     bub = np.hstack(hmatr)
-
-
-
 
     return Aub, bub
 
@@ -262,12 +223,8 @@ def solve_lp_fin(c, Aub, bub, bounds, l, terms, vars, opt_meth):
         epsilon = x_optimal[-3]
         sigma = x_optimal[-2]
         y_optimal = x_optimal[-1]
-
         a_optimal = construct_complex_coefficients(Re_a_optimal, Im_a_optimal)
-
-
         barrier_certificate = generate_barrier_polynomial(a_optimal, terms, vars)
-
         return barrier_certificate, a_optimal, (epsilon, sigma, y_optimal)
 
     else:
@@ -280,7 +237,6 @@ def solve_lp_fin(c, Aub, bub, bounds, l, terms, vars, opt_meth):
 def generate_constraints_inf(
         real_imag_list: List[np.ndarray],
         constraint_type: str,
-        num_time_steps: int,
         dynamic_real_imag_list: List[np.ndarray] = None,
         right_hand_value: float = 0,
         epsilon: float = 0,
@@ -375,13 +331,10 @@ def generate_constraints_inf(
 
             # Coefficients for B_{t+1}(z)
             Aub_coeffs[:, start_idx_t1:start_idx_t1 + num_vars_per_time] = sign * np.hstack([re, -im])
-
             # Subtract coefficients for B_t(z)
             Aub_coeffs[:, start_idx_t:start_idx_t + num_vars_per_time] -= sign * np.hstack([re, -im])
-
             # Right-hand side
             bub = np.full(num_samples, gamma, dtype=np.float64)
-
             Aub_list.append(Aub_coeffs)
             bub_list.append(bub)
 
@@ -441,7 +394,6 @@ def generate_all_constraints_inf(
         real_imag_list=initial_real_imag_list,
         constraint_type='initial',
         unitaries=unitaries,
-        num_time_steps=K,
         right_hand_value=right_hand_value
     )
 
@@ -449,7 +401,6 @@ def generate_all_constraints_inf(
     Aub_unsafe, bub_unsafe = generate_constraints_inf(
         real_imag_list=unsafe_real_imag_list,
         constraint_type='unsafe',
-        num_time_steps=K,
         right_hand_value=right_hand_value,
         unitaries=unitaries
     )
@@ -459,7 +410,6 @@ def generate_all_constraints_inf(
         real_imag_list=dynamic_initial_real_imag_list,
         dynamic_real_imag_list=dynamic_real_imag_list,
         constraint_type='dynamic',
-        num_time_steps=K,
         epsilon=epsilon,
         unitaries=unitaries
     )
@@ -470,7 +420,6 @@ def generate_all_constraints_inf(
         dynamic_real_imag_list=k_initial_real_imag_list,
         constraint_type='k_inductive',
         unitaries=unitaries,
-        num_time_steps=K,
         right_hand_value=right_hand_value
     )
 
@@ -486,7 +435,6 @@ def generate_all_constraints_inf(
         Aub_time_evolution, bub_time_evolution = generate_constraints_inf(
             real_imag_list=time_real_imag_list,
             constraint_type='time_evolution',
-            num_time_steps=K,
             gamma=gamma,
             unitaries=unitaries
         )

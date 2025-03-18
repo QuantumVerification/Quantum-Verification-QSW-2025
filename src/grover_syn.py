@@ -1,9 +1,3 @@
-import sys
-import os
-
-parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-sys.path.append(parent_dir)
-
 from src.check_bc import *
 from src.check_bc import _sympy_to_z3_rec
 from src.log import *

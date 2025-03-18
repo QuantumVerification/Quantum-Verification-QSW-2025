@@ -1,10 +1,3 @@
-import sys
-import os
-parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-sys.path.append(parent_dir)
-
-
-
 from src.utils import *
 from src.find_bc import *
 from src.grover_syn import *
@@ -12,7 +5,6 @@ from src.gates import *
 from src.log import *
 import argparse
 import datetime
-import logging
 
 
 def Z_example(N_QUBIT):
@@ -89,7 +81,7 @@ def CXCZ_example(N_QUBIT):
     Zu = [{'variables': [Z[0]], 'min': 0, 'max': 0.1, 'imConstr': {}}]
     unitaries = [np.dot(n_gate(CXgate, N_QUBIT // 2), n_gate(CZgate, N_QUBIT // 2))]
 
-    return Z, var, Z0, Zu, unitaries, log_file
+    return
 
 
 def H_example(N_QUBIT):
@@ -103,7 +95,6 @@ def H_example(N_QUBIT):
     return Z, var, Z0, Zu, unitaries, log_file
 
 
-# SWAP todo
 def SWAP_example(N_QUBIT):
     if N_QUBIT % 2 != 0:
         raise Exception('Number of qubits should be even.')
@@ -112,7 +103,7 @@ def SWAP_example(N_QUBIT):
     var = generate_variables(Z)
     Z0 = [{'variables': [Z[1]], 'min': 0.9, 'max': 1.0, 'imConstr': {}}]
     Zu = [{'variables': [Z[0]], 'min': 0.5, 'max': 1.0, 'imConstr': {}}]
-    unitaries = [n_gate(SWAP, N_QUBIT // 2)]
+    unitaries = [n_gate(SWAP, N_QUBIT)]
 
     return Z, var, Z0, Zu, unitaries, log_file
 
@@ -187,7 +178,7 @@ parser.add_argument("--mu", type=float, default=0.3,
 parser.add_argument("-type", type=str, default='infinite',
                     help="Barrier Certificate Type.")
 parser.add_argument("--steps", type=int, default=1,
-                    help="Deviation bound on the grover operator G, to capture noisy dynamic.")
+                    help="NUmber of steps for the finite horizon BC.")
 
 if __name__ == '__main__':
     args = parser.parse_args()
@@ -197,7 +188,7 @@ if __name__ == '__main__':
         Z, var, Z0, Zu, unitaries, log_file = X_example(N_QUBIT=args.n)
     elif args.example == 'cx_cz_gate':
         Z, var, Z0, Zu, unitaries, log_file = CX_CZ_example(N_QUBIT=args.n)
-    elif args.example == 'cxczgate':
+    elif args.example == 'cxcz_gate':
         Z, var, Z0, Zu, unitaries, log_file = CXCZ_example(N_QUBIT=args.n)
     elif args.example == 'cnot' or args.example == 'cx':
         Z, var, Z0, Zu, unitaries, log_file = CX_example(N_QUBIT=args.n)

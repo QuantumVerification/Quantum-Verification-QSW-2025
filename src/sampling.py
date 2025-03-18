@@ -1,5 +1,6 @@
 import numpy as np
 import sympy as sym
+import math
 from scipy.stats import qmc
 from src.utils import *
 
@@ -7,22 +8,8 @@ from src.utils import *
 def generate_values(terms, *args):
     ret = []
     for reg in args:
-        sampled_terms = generate_sampled_terms(terms, reg)
-        values = separate_real_imag(sampled_terms)
-        ret.append(values)
-    '''
-    i_sampled_terms = generate_sampled_terms(terms, i_samples)
-    u_sampled_terms = generate_sampled_terms(terms, u_samples)
-    d_sampled_terms = generate_sampled_terms(terms, d_samples)
-
-    dynamic_sampled_terms = generate_sampled_terms(terms, dynamic_samples)
-
-
-    i_values = separate_real_imag(i_sampled_terms)
-    u_values = separate_real_imag(u_sampled_terms)
-    d_values = separate_real_imag(d_sampled_terms)
-    dynamic_values = separate_real_imag(dynamic_sampled_terms)
-    '''
+        sampled_values = generate_sampled_terms(terms, reg)
+        ret.append(sampled_values)
     return tuple(ret)
 
 def normalizeComplex(z, imag_min, imag_max):
@@ -36,7 +23,6 @@ def normalizeComplex(z, imag_min, imag_max):
 
     newComplex = newReal + 1j * newImaginary
     return newComplex
-
 
 def sample_states(constraints, z, n_samples=100):
     """
@@ -54,7 +40,6 @@ def sample_states(constraints, z, n_samples=100):
     - samples: List of dictionaries, each mapping variables to complex amplitudes
     """
     samples = []
-    N = len(z)
     if len(constraints) == 0:
         constraints = [{'variables': [], 'max': 1.0, 'min': 0.0}]
 
@@ -67,6 +52,7 @@ def sample_states(constraints, z, n_samples=100):
 
         # Generate quasi-random numbers for the total probability mass S_constr
         # Here, we use 1-dimensional Sobol sequence
+        n_samples= 2 ** (math.ceil(math.log2(n_samples)))
         sampler_S = qmc.Sobol(d=1, scramble=False)
         S_constr_samples = sampler_S.random(n=n_samples).flatten()
         # Scale samples to [min_sum, max_sum]
@@ -141,68 +127,35 @@ def sample(Z, n_samples, *args):
     for region in args:
         samples = sample_states(region, Z, n_samples)
         ret.append(samples)
+    return tuple(ret)
 
-    '''
-    print("fase 2...")
-    state_vectors = create_state_vectors(d_samples, Z)
-    dynamic_samples = generate_fx_samples(state_vectors, unitary, Z)
-    dynamic_k_samples = generate_fx_samples_k_times(state_vectors, unitary, Z, k)
-    '''
-    ret = tuple(ret)
-    return ret
-
-
-
-
-def create_state_vectors(samples, Z):
-    state_vectors = []
-    for sample in samples:
-        #print(sample)
-        state = []
-        for z in Z:
-            '''
-            state = []
-            for e in sample.values():
-                state.append(e)
-            '''
-            state.append(sample[z])
-        state_vectors.append(state)
-    return state_vectors
-
-
-def generate_fx_samples(state_vectors, op, Z):
-    dynamic_samples = []
-    for state_vector in state_vectors:
-        sample = {}
-        new_state = apply_op(state_vector, op)
-        for i, z in enumerate(Z):
-            sample[z] = new_state[i]
-            sample[z.conjugate()] = np.conj(new_state[i])
-        dynamic_samples.append(sample)
-    return dynamic_samples
-
-
-'''
-Substitute the terms with the corresponding sampled values values
-'''
 def generate_sampled_terms(terms : list[tuple], samples) -> list[list]:
     sampled_terms = []
     for sample in samples:
-        p = [map(lambda x: sample.get(x, x), term) for term in terms]
-        p = [np.prod([t for t in term]) for term in p] # each term is a list of variables, so get the product
+        p = [np.prod([t for t in map(lambda x: sample.get(x, x), term)]) for term in terms]
+        p = [(value.real,value.imag) for value in p]
         sampled_terms.append(p)
-    return sampled_terms
+    return np.array(sampled_terms)
 
-
-def generate_k_fx_samples(state_vectors, ops, Z):
+def generate_fx_samples(samples, Z, op):
     dynamic_samples = []
-    for state_vector in state_vectors:
-        sample = {}
-        new_state = state_vector
-        for op in ops:
-            new_state = apply_op(new_state, op)
+    for sample in samples:
+        new_sample = {}
+        new_state = apply_op([sample[z] for z in Z], op)
         for i, z in enumerate(Z):
-            sample[z] = new_state[i]
-            sample[z.conjugate()] = np.conj(new_state[i])
-        dynamic_samples.append(sample)
+            new_sample[z] = new_state[i]
+            new_sample[z.conjugate()] = np.conj(new_state[i])
+        dynamic_samples.append(new_sample)
+    return dynamic_samples
+
+def generate_k_fx_samples(samples, Z, ops):
+    dynamic_samples = []
+    for sample in samples:
+        new_sample = {}
+        new_state= [sample[z] for z in Z]
+        for op in ops: new_state = apply_op(new_state, op)
+        for i, z in enumerate(Z):
+            new_sample[z] = new_state[i]
+            new_sample[z.conjugate()] = np.conj(new_state[i])
+        dynamic_samples.append(new_sample)
     return dynamic_samples

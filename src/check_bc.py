@@ -5,13 +5,7 @@ from z3.z3 import *
 import sympy as sym
 from sympy.core import *
 
-
-
-
 logger = logging.getLogger("smtcheck")
-
-
-
 
 def _sympy_to_z3_rec(var_map, e):
     'recursive call for sympy_to_z3()'
