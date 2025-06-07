@@ -111,7 +111,7 @@ def constraints_Grover(N, M, err, num_samples, mu):
     return A, b, lower_bound_i, upper_bound_i, lower_bound_u, upper_bound_u
 
 
-def find_BC_grover(N_QUBIT, n_samples, err, mu, log_level=logging.INFO):
+def find_BC_grover(N_QUBIT, n_samples, err, mu, log_level=logging.INFO, num_solutions):
     logger.setLevel(log_level)
     sampling_logger.setLevel(log_level)
     linprog_logger.setLevel(log_level)
@@ -119,7 +119,7 @@ def find_BC_grover(N_QUBIT, n_samples, err, mu, log_level=logging.INFO):
     logger.info("Setting parameters...")
     N = pow(2, N_QUBIT)
     logger.info("Number of states K: " + str(N))
-    M = N // 4
+    M = num_solutions
     logger.info("Number of solution states M: " + str(M))
     start = time.perf_counter()
     T = ceil((pi / 4) * sqrt(N / M))
