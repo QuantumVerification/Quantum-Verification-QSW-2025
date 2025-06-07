@@ -175,10 +175,13 @@ parser.add_argument("--smt-timeout", type=int, default=300, help="Set timeout fo
 parser.add_argument("--err", type=float, default=0.5, help="Error margin to perturbate M yielding uncertainties.")
 parser.add_argument("--mu", type=float, default=0.3,
                     help="Deviation bound on the grover operator G, to capture noisy dynamic.")
+parser.add_argument("--m", type=int, default=1,
+                    help="Numer of solution states M for the grover example")
 parser.add_argument("-type", type=str, default='infinite',
                     help="Barrier Certificate Type.")
 parser.add_argument("--steps", type=int, default=1,
                     help="Number of steps for the finite horizon BC.")
+
 
 if __name__ == '__main__':
     args = parser.parse_args()
@@ -212,7 +215,7 @@ if __name__ == '__main__':
         raise Exception(f"Invalid example. Choose one from {examples}")
 
     if args.example == 'grover_geo':
-        find_BC_grover(N_QUBIT=args.n, n_samples=args.samples, err=args.err, mu=args.mu)
+        find_BC_grover(N_QUBIT=args.n, n_samples=args.samples, err=args.err, mu=args.mu, num_solutions=args.m)
     else:
         if args.type == 'infinite':
             run_example(Z, var, args.samples, log_file, Z0, Zu, unitaries, True, poly_degree=args.barrier_degree, k=args.k, epsilon=args.epsilon, gamma=args.gamma, smt_timeout=args.smt_timeout)
